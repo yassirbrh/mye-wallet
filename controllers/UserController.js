@@ -65,6 +65,9 @@ const loginUser = asyncHandler(async (req, res) => {
                 _id, firstName, lastName, userName, email, gender
             });
         }
+    } else {
+        res.status(400);
+        throw new Error('Invalid username !!');
     }
 });
 
@@ -98,8 +101,9 @@ const getUser = asyncHandler(async (req, res) => {
 const loginStatus = asyncHandler(async (req, res) => {
     if (req.session.userId) {
         res.json(true);
+    } else {
+        res.json(false);
     }
-    res.json(false);
 });
 
 module.exports = {

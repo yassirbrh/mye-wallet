@@ -1,7 +1,7 @@
 import User from '../models/UserModel';
 const asyncHandler = require('express-async-handler');
 
-const authProtect = asyncHandler(async (req, res) => {
+const authProtect = asyncHandler(async (req, res, next) => {
     try {
         const session = req.session;
 
@@ -9,7 +9,7 @@ const authProtect = asyncHandler(async (req, res) => {
             throw new Error('Not Authorized !! please login !!');
         }
 
-        const user = User.findById(session.userId).select("-__v -password -isAccepted");
+        const user = await User.findById(session.userId).select("-__v -password -isAccepted");
         if (user) {
             req.user = user._doc;
         } else {
@@ -17,8 +17,8 @@ const authProtect = asyncHandler(async (req, res) => {
         }
         next();
     } catch(error) {
-        res.status(401);
-        throw new Error(error.message);
+        res.status(401).send("Unauthorized");
+        console.log(error.message);
     }
 });
 
