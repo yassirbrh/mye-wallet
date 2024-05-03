@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
+import calculateAge from "../utils/calculateAge";
 
 const UserSchema = mongoose.Schema({
     firstName: {
@@ -36,9 +37,16 @@ const UserSchema = mongoose.Schema({
         type: Number,
         required: false
     },
-    photo: {
-        type: Buffer,
-        required: false
+    birthDate: {
+        type: Date,
+        required: true,
+        validate: {
+            validator: function(value) {
+                const age = calculateAge(value);
+                return age >= 18;
+            },
+            message: "You must be over 18 years old to register"
+        }
     },
     isAccepted: {
         type: Boolean,
