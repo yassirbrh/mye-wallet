@@ -2,6 +2,7 @@ const cors = require('cors');
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
 import RedisStore from 'connect-redis';
@@ -11,6 +12,7 @@ const UserRoute = require('./routes/UserRoute');
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
     origin: true,
     credentials: true
