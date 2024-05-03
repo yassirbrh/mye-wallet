@@ -1,11 +1,12 @@
 import User from '../models/UserModel';
+import File from '../models/FileModel';
 const asyncHandler = require('express-async-handler');
 const bcryptjs = require('bcryptjs');
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { firstName, lastName, email, password, userName, gender} = req.body;
+    const { firstName, lastName, email, password, userName, gender, birthDate} = req.body;
 
-    if (!firstName || !lastName || !email || !password || !userName || !gender) {
+    if (!firstName || !lastName || !email || !password || !userName || !gender || !birthDate) {
         res.status(400);
         throw new Error("Please fill all the required fields");
     }
@@ -21,13 +22,13 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("Email has already been registered");
     }
     const user = await User.create({
-        firstName, lastName, userName, email, password, gender
+        firstName, lastName, userName, email, password, gender, birthDate
     });
 
     if (user) {
-        const { _id, firstName, lastName, userName, email, gender } = user;
+        const { _id, firstName, lastName, userName, email, gender, birthDate } = user;
         res.status(201).json({
-            _id, firstName, lastName, userName, email, gender
+            _id, firstName, lastName, userName, email, gender, birthDate
         });
     } else {
         res.status(400);
@@ -72,13 +73,15 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-    req.session.destroy(err => {
+    req.session.destroy((err) => {
         if (err) {
             console.error('Error destroying session:', err);
             res.sendStatus(500);
         } else {
-            res.clearCookie('userName');
-            res.redirect('/');
+            res.clearCookie('username');
+            res.clearCookie('connect.sid');
+            //res.redirect('/');
+            res.sendStatus(200);
         }
     });
 });
@@ -106,10 +109,121 @@ const loginStatus = asyncHandler(async (req, res) => {
     }
 });
 
+const updateUser = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    const allowedAttributes = ['firstName', 'lastName', 'email', 'birthDate'];
+
+    if (!user) {
+        res.status(404).send('User not found !!');
+    } else {
+        allowedAttributes.forEach(attribute => {
+            if (req.body[attribute] !== undefined) {
+                user[attribute] = req.body[attribute];
+            }
+        });
+        const updatedUser = await user.save();
+
+        res.status(200).json({
+            firstName: updatedUser.firstName,
+            lastName: updatedUser.lastName,
+            email: updatedUser.email,
+            photo: updatedUser.photo,
+            birthDate: updatedUser.birthDate
+        });
+    }
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.session.userId);
+
+    if (!user) {
+        res.status(404).send('User not found !!');
+    }
+
+    const { oldPassword, password } = req.body;
+  
+    // Validate
+    if (!oldPassword || !password) {
+      res.status(400).send("Please add old and new password");
+    }
+  
+    // Check if old password matches password in DB
+    const passwordIsCorrect = await bcryptjs.compare(oldPassword, user.password);
+  
+    // Save new password
+    if (passwordIsCorrect) {
+      user.password = password;
+      await user.save();
+      res.status(200).send("Password change successful");
+    } else {
+      res.status(400);
+      throw new Error("Old password is incorrect");
+    }
+});
+
+const uploadPhoto = asyncHandler(async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        const file = await File.findOne({ userId: req.session.userId, type: 'ProfilePhoto' });
+        const imageBuffer = req.file.buffer;
+        const contentType = req.file.mimetype;
+        const type = 'ProfilePhoto';
+
+        if (user) {
+            if (file) {
+                file['data'] = imageBuffer;
+                file['contentType'] = contentType;
+                await file.save();
+            } else {
+                const newFile = new File({
+                    userId: req.session.userId,
+                    data: imageBuffer,
+                    type,
+                    contentType
+                });
+                await newFile.save();
+            }
+
+            res.status(201).send('Image uploaded successfully');
+        } else {
+            res.status(404).send('User not found !!');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+const getPhoto = asyncHandler(async (req, res) => {
+    try {
+        // Find the user by userId
+        const user = await User.findById(req.session.userId);
+        const file = await File.findOne({ userId: req.session.userId, type: 'ProfilePhoto'});
+
+        // Check if user exists and has a photo
+        if (!user || !file) {
+            return res.status(404).send('Image not found');
+        }
+
+        // Set the appropriate content type in the response headers
+        res.set('Content-Type', file.contentType); // Assuming the photo is JPEG format
+
+        // Send the image data
+        res.send(file.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 module.exports = {
     registerUser,
     loginUser,
     logoutUser,
     getUser,
-    loginStatus
+    loginStatus,
+    updateUser,
+    changePassword,
+    uploadPhoto,
+    getPhoto
 };
