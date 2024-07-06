@@ -8,7 +8,10 @@ const dotenv = require('dotenv').config();
 import RedisStore from 'connect-redis';
 import { createClient } from 'redis';
 const UserRoute = require('./routes/UserRoute');
+const RequestRoute = require('./routes/RequestRoute');
+const AdminRoute = require('./routes/AdminRoute');
 
+// Main application management
 const app = express();
 
 app.use(express.json());
@@ -30,8 +33,9 @@ let redisStore = new RedisStore({
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
+    name: 'userconnect.sid',
     store: redisStore,
-    secret: 'your_secret_key',
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
     cookie: { 
@@ -39,19 +43,65 @@ app.use(session({
     }
 }));
 
+// application endpoints
 app.use('/api/users', UserRoute);
+app.use('/api/requests', RequestRoute);
+// end of app endpoints
+
+// Application admin management
+
+const admin = express();
+
+admin.use(express.json());
+admin.use(cookieParser());
+admin.use(cors({
+    origin: true,
+    credentials: true
+}));
+
+// Initialize client.
+let redisAdmin = createClient()
+redisAdmin.connect().catch(console.error)
+
+// Initialize store.
+let redisAdminStore = new RedisStore({
+  client: redisAdmin,
+  prefix: "myapp:",
+})
+
+admin.use(bodyParser.urlencoded({ extended: true }));
+admin.use(session({
+    name: 'adminconnect.sid',
+    store: redisAdminStore,
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { 
+        expires: new Date(Date.now() + 3600000 * 24)
+    }
+}));
+
+admin.use('/api/admin', AdminRoute);
 
 const PORT = process.env.PORT || 5000;
+const ADMIN_PORT = process.env.ADMIN_PORT || 5001
 
 app.get('/', (req, res) => {
     res.status(200).send({message: "Let's goo !!!"})
 });
+
+admin.get('/', (req, res) => {
+    res.status(200).send({message: "Let's goo admin !!"});
+})
 
 mongoose
     .connect(process.env.MONGODB_URI)
     .then(() => {
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
+        });
+        admin.listen(ADMIN_PORT, () => {
+            console.log(`Admin Server running on port ${ADMIN_PORT}`);
         })
     })
     .catch((error) => console.log(error))
