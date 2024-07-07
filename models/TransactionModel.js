@@ -21,9 +21,9 @@ const TransactionSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    notifMessage: {
-        type: String,
-        required: true
+    doneAt: {
+        type: Date,
+        required: false
     }
 });
 

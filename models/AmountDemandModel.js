@@ -9,6 +9,10 @@ const AmountDemandSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    doneAt: {
+        type: Date,
+        required: true
+    },
     state: {
         type: String,
         required: false,

@@ -9,6 +9,14 @@ const NotificationSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    type: {
+        type: String,
+        required: true
+    },
+    notifID: {
+        type: mongoose.Types.ObjectId,
+        required: true
+    },
     state: {
         type: String,
         default: 'unchecked'
