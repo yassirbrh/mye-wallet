@@ -11,13 +11,13 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("Please fill all the required fields");
     }
 
-    const userNameExists = User.findOne({ userName });
-    if (!userNameExists) {
+    const userNameExists = await User.findOne({ userName });
+    if (userNameExists !== null) {
         res.status(400);
         throw new Error("Username has already been registered");
     }
-    const emailExists = User.findOne({ email });
-    if (!emailExists) {
+    const emailExists = await User.findOne({ email });
+    if (emailExists !== null) {
         res.status(400);
         throw new Error("Email has already been registered");
     }
@@ -57,11 +57,6 @@ const loginUser = asyncHandler(async (req, res) => {
             const { _id, firstName, lastName, userName, email, gender } = user;
 
             req.session.userId = _id;
-            res.cookie("username", userName, {
-                path: "/",
-                expires: new Date(Date.now() + 1000 * 86400),
-                secure: false
-            });
             res.status(200).json({
                 _id, firstName, lastName, userName, email, gender
             });
@@ -78,9 +73,7 @@ const logoutUser = asyncHandler(async (req, res) => {
             console.error('Error destroying session:', err);
             res.sendStatus(500);
         } else {
-            res.clearCookie('username');
-            res.clearCookie('connect.sid');
-            //res.redirect('/');
+            res.clearCookie('userconnect.sid');
             res.sendStatus(200);
         }
     });
