@@ -5,65 +5,67 @@ const bcryptjs = require('bcryptjs');
 
 const registerUser = asyncHandler(async (req, res) => {
     const { firstName, lastName, email, password, userName, gender, birthDate} = req.body;
+    try  {
+        if (!firstName || !lastName || !email || !password || !userName || !gender || !birthDate) {
+            throw new Error("Please fill all the required fields");
+        }
 
-    if (!firstName || !lastName || !email || !password || !userName || !gender || !birthDate) {
-        res.status(400);
-        throw new Error("Please fill all the required fields");
-    }
-
-    const userNameExists = await User.findOne({ userName });
-    if (userNameExists !== null) {
-        res.status(400);
-        throw new Error("Username has already been registered");
-    }
-    const emailExists = await User.findOne({ email });
-    if (emailExists !== null) {
-        res.status(400);
-        throw new Error("Email has already been registered");
-    }
-    const user = await User.create({
-        firstName, lastName, userName, email, password, gender, birthDate
-    });
-
-    if (user) {
-        const { _id, firstName, lastName, userName, email, gender, birthDate } = user;
-        res.status(201).json({
-            _id, firstName, lastName, userName, email, gender, birthDate
+        const userNameExists = await User.findOne({ userName });
+        if (userNameExists !== null) {
+            throw new Error("Username has already been registered");
+        }
+        const emailExists = await User.findOne({ email });
+        if (emailExists !== null) {
+            throw new Error("Email has already been registered");
+        }
+        const user = await User.create({
+            firstName, lastName, userName, email, password, gender, birthDate
         });
-    } else {
-        res.status(400);
-        throw new Error("Invalid user data");
+
+        if (user) {
+            const { _id, firstName, lastName, userName, email, gender, birthDate } = user;
+            res.status(201).json({
+                _id, firstName, lastName, userName, email, gender, birthDate
+            });
+        } else {
+            throw new Error("Invalid user data");
+        }
+    } catch(error) {
+        res.status(400).json({ message: error.toString() });
+        console.log(error.toString())
     }
 });
 
 const loginUser = asyncHandler(async (req, res) => {
     const { userName, password } = req.body;
 
-    if (!userName || !password) {
-        res.status(400);
-        throw new Error("Please enter a username and password !!");
-    }
 
-    const user = await User.findOne({ userName });
-    if (user) {
-        const isPasswordCorrect = await bcryptjs.compare(password, user.password);
-        if (!isPasswordCorrect) {
-            res.status(400);
-            throw new Error("Password incorrect !!");
-        } else if (!user.isAccepted) {
-            res.status(400);
-            throw new Error("The director didn't accept your request yet !! Please try to login after getting accepted")
-        } else {
-            const { _id, firstName, lastName, userName, email, gender } = user;
-
-            req.session.userId = _id;
-            res.status(200).json({
-                _id, firstName, lastName, userName, email, gender
-            });
+    try {
+        if (!userName || !password) {
+            throw new Error("Please enter a username and password !!");
         }
-    } else {
-        res.status(400);
-        throw new Error('Invalid username !!');
+
+        const user = await User.findOne({ userName });
+        if (user) {
+            const isPasswordCorrect = await bcryptjs.compare(password, user.password);
+            if (!isPasswordCorrect) {
+                throw new Error("Password incorrect !!");
+            } else if (!user.isAccepted) {
+                throw new Error("The director didn't accept your request yet !! Please try to login after getting accepted")
+            } else {
+                const { _id, firstName, lastName, userName, email, gender } = user;
+
+                req.session.userId = _id;
+                res.status(200).json({
+                    _id, firstName, lastName, userName, email, gender
+                });
+            }
+        } else {
+            throw new Error('Invalid username !!');
+        }
+    } catch(error) {
+        res.status(400).json({message: error.toString()});
+        console.log(error.toString());
     }
 });
 
