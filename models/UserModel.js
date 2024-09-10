@@ -48,6 +48,10 @@ const UserSchema = mongoose.Schema({
             message: "You must be over 18 years old to register"
         }
     },
+    Beneficiaries: {
+        type: Array,
+        default: []
+    },
     isAccepted: {
         type: Boolean,
         default: false
