@@ -29,8 +29,8 @@ const transferMoney = asyncHandler(async (req, res) => {
                 notifID: savedTransaction._id
             });
             await notification.save();
-            sender.balance -= transactionBalance;
-            receiver.balance += transactionBalance;
+            sender.balance = parseFloat((sender.balance - transactionBalance).toFixed(2));
+            receiver.balance = parseFloat(receiver.balance) + parseFloat(transactionBalance);
             await sender.save();
             await receiver.save();
         } else {
