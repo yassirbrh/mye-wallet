@@ -35,7 +35,7 @@ const UserSchema = mongoose.Schema({
     },
     balance: {
         type: Number,
-        required: false
+        default: 0
     },
     birthDate: {
         type: Date,
