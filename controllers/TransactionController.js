@@ -30,7 +30,9 @@ const transferMoney = asyncHandler(async (req, res) => {
             });
             await notification.save();
             sender.balance -= transactionBalance;
+            receiver.balance += transactionBalance;
             await sender.save();
+            await receiver.save();
         } else {
             const transaction = new Transaction({
                 senderID,
