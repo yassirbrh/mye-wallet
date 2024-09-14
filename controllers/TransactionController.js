@@ -50,6 +50,7 @@ const transferMoney = asyncHandler(async (req, res) => {
             });
             await notification.save();
         }
+        res.status(200).send('Transaction Successful !!');
     } else {
         res.status(401).send('Something went wrong !!');
     }
