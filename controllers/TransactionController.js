@@ -40,7 +40,8 @@ const transferMoney = asyncHandler(async (req, res) => {
                 receiverID: receiver._id,
                 transactionBalance,
                 isDone: false,
-                senderMessage
+                senderMessage,
+                doneAt: new Date()
             });
             const savedTransaction = await transaction.save();
             const notification = new Notification({
