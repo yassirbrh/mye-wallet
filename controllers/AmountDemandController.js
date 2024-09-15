@@ -8,18 +8,20 @@ const requestBalance = asyncHandler(async (req, res) => {
 
     const user = await User.findById(userID);
 
-    if (typeof amount !== 'number') {
-        res.status(400).send("Amount should be a number !!")
+    // Ensure amount is a valid number
+    if (isNaN(amount) || amount <= 0) {
+        return res.status(400).json({ message: "Amount should be a valid positive number !!" });
     }
-    else if (user) {
+
+    if (user) {
         const doneAt = new Date();
         const newDemand = new AmountDemand({
             userID, amount, doneAt
         });
-        newDemand.save();
-        res.status(200).send("Demand successfully registered !! pending !!");
+        await newDemand.save();
+        res.status(200).json({ message: "Demand successfully registered !! pending !!" });
     } else {
-        res.status(401).send("User Not Found !!");
+        res.status(401).json({ message: "User Not Found !!" });
     }
 });
 
