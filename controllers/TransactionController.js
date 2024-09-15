@@ -33,6 +33,7 @@ const transferMoney = asyncHandler(async (req, res) => {
             receiver.balance = parseFloat(receiver.balance) + parseFloat(transactionBalance);
             await sender.save();
             await receiver.save();
+            res.status(200).send({message: 'Transaction Successful !!'});
         } else {
             const transaction = new Transaction({
                 senderID,
@@ -49,10 +50,10 @@ const transferMoney = asyncHandler(async (req, res) => {
                 notifID: savedTransaction._id
             });
             await notification.save();
+            res.status(400).send({ message: 'Insufficient balance for transaction.' });
         }
-        res.status(200).send({message: 'Transaction Successful !!'});
     } else {
-        res.status(401).send('Something went wrong !!');
+        res.status(400).send({ message: 'Invalid receiver username !!' });
     }
 });
 
