@@ -211,6 +211,18 @@ const getPhoto = asyncHandler(async (req, res) => {
     }
 });
 
+
+const getUsernameById = asyncHandler(async (req, res) => {
+    try {
+        const user = await User.findById(req.body.receiverID);
+
+        res.status(200).send({ receiverUsername: user.userName });
+    } catch (error) {
+        console.log(error);
+        res.status(400).send({message: 'User not found !!'});
+    }
+});
+
 module.exports = {
     registerUser,
     loginUser,
@@ -220,5 +232,6 @@ module.exports = {
     updateUser,
     changePassword,
     uploadPhoto,
-    getPhoto
+    getPhoto,
+    getUsernameById
 };
