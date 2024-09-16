@@ -66,7 +66,7 @@ const getTransactions = asyncHandler(async (req, res) => {
             { senderID: userId },
             { receiverID: userId }
         ]
-    });
+    }).sort({ doneAt: -1 }); // Sort by doneAt in descending order
 
     res.status(200).send(transactions);
 });
