@@ -18,7 +18,7 @@ router.post('/updateuser', authProtect, UserController.updateUser);
 router.post('/changepassword', authProtect, UserController.changePassword);
 router.post('/uploadphoto', authProtect, upload.single('photo'), UserController.uploadPhoto);
 router.get('/getphoto', authProtect, UserController.getPhoto);
-router.get('/gettransactions', authProtect, TransactionController.getTransactions);
+router.get('/gettransactions:limit?', authProtect, TransactionController.getTransactions);
 router.post('/transfer', authProtect, TransactionController.transferMoney);
 
 module.exports = router;
