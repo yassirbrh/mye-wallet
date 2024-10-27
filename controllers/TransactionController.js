@@ -60,13 +60,16 @@ const transferMoney = asyncHandler(async (req, res) => {
 
 const getTransactions = asyncHandler(async (req, res) => {
     const userId = req.session.userId;
+    const limit = parseInt(req.query.limit); // Parse the query parameter as an integer
 
     const transactions = await Transaction.find({
         $or: [
             { senderID: userId },
-            { receiverID: userId }
+            { receiverID: userId, isDone: true }
         ]
-    }).sort({ doneAt: -1 }); // Sort by doneAt in descending order
+    })
+    .sort({ doneAt: -1 })
+    .limit(limit); // Apply the limit if provided
 
     res.status(200).send(transactions);
 });
