@@ -14,5 +14,6 @@ router.get('/getbalancerequests', authProtect, AmountDemandController.getBalance
 router.post('/getusernamebyid', authProtect, UserController.getUsernameById);
 router.get('/getnotifications:limit?', authProtect, NotificationController.getNotifications);
 router.post('/seenotifications', authProtect, NotificationController.seeNotifications);
+router.post('/checknotification', authProtect, NotificationController.checkNotification);
 
 module.exports = router;
