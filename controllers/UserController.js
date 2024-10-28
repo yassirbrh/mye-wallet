@@ -84,9 +84,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
     if (req.user) {
         const userAttributes = Object.keys(req.user).reduce((obj, key) => {
-            if (key !== '_id') {
-                obj[key] = req.user[key];
-            }
+            obj[key] = req.user[key];
             return obj;
           }, {});
         res.status(200).json(userAttributes);
