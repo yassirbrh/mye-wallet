@@ -104,7 +104,7 @@ const loginStatus = asyncHandler(async (req, res) => {
 
 const updateUser = asyncHandler(async (req, res) => {
     const user = await User.findById(req.session.userId);
-    const allowedAttributes = ['firstName', 'lastName', 'email', 'birthDate'];
+    const allowedAttributes = ['firstName', 'lastName', 'email'];
 
     if (!user) {
         res.status(404).send('User not found !!');
