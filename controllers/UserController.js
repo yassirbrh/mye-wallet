@@ -149,8 +149,7 @@ const changePassword = asyncHandler(async (req, res) => {
       await user.save();
       res.status(200).send("Password change successful");
     } else {
-      res.status(400);
-      throw new Error("Old password is incorrect");
+      res.status(400).send("Old password is incorrect");
     }
 });
 
