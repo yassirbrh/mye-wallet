@@ -1,0 +1,23 @@
+/* MainLayout.module.css */
+.mainLayout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(-45deg, #3a7bd5, #4682b4, #1e90ff, #87cefa);
+    background-size: 400% 400%;
+    animation: moveGradient 8s ease infinite;
+    overflow-x: hidden; /* Keeps the layout clean */
+  }
+  
+  @keyframes moveGradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  
