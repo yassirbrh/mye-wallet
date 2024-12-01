@@ -6,7 +6,8 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
 import RedisStore from 'connect-redis';
-import { createClient } from 'redis';
+import redisClient from './cache/redisClient';
+import redisAdmin from './cache/redisAdmin';
 const UserRoute = require('./routes/UserRoute');
 const RequestRoute = require('./routes/RequestRoute');
 const AdminRoute = require('./routes/AdminRoute');
@@ -21,9 +22,6 @@ app.use(cors({
     credentials: true
 }));
 
-// Initialize client.
-let redisClient = createClient()
-redisClient.connect().catch(console.error)
 
 // Initialize store.
 let redisStore = new RedisStore({
@@ -58,10 +56,6 @@ admin.use(cors({
     origin: true,
     credentials: true
 }));
-
-// Initialize client.
-let redisAdmin = createClient()
-redisAdmin.connect().catch(console.error)
 
 // Initialize store.
 let redisAdminStore = new RedisStore({
