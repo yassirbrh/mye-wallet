@@ -1,11 +1,17 @@
+import axios from "axios";
 import React, { useState } from "react";
 import Topbar from "./Bars/Topbar";
 import OverviewBalance from "./OverviewPage/OverviewBalance";
 import OverviewButtons from "./OverviewPage/OverviewButtons";
 import OverviewTransactions from "./OverviewPage/OverviewTransactions";
 import ProfileInfo from "./ProfilePage/ProfileInfo";
+import TransactionButton from "./TransactionPage/TransactionButton";
+import TransactionDashboard from "./TransactionPage/TransactionDashboard";
 
 const MainContent = ({userData, currentPage}) => {
+    if (currentPage === 'TransactionPage') {
+        axios.get('/api/users/cacheloadtransactions', { withCredentials: true }).catch(console.error);
+    }
     return (
         <>
             <div className="main-content">
@@ -19,6 +25,11 @@ const MainContent = ({userData, currentPage}) => {
                 ): currentPage === 'ProfilePage' ? (
                     <>
                         <ProfileInfo userData={userData}/>
+                    </>
+                ): currentPage === 'TransactionPage' ? (
+                    <>
+                        <TransactionButton userData={userData}/>
+                        <TransactionDashboard />
                     </>
                 ): null}
             </div>
