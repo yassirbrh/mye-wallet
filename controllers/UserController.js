@@ -1,5 +1,6 @@
 import User from '../models/UserModel';
 import File from '../models/FileModel';
+import redisClient from '../cache/redisClient';
 const asyncHandler = require('express-async-handler');
 const bcryptjs = require('bcryptjs');
 
@@ -70,15 +71,37 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Error destroying session:', err);
-            res.sendStatus(500);
-        } else {
+    const userId = req.session.userId; // Retrieve user ID from session
+
+    if (!userId) {
+        return res.status(400).send({ message: "User not authenticated" });
+    }
+
+    // Define cache key pattern
+    const cacheKeyPattern = `*${userId}*`;
+
+    try {
+        // Retrieve all keys matching the user ID pattern
+        const keys = await redisClient.keys(cacheKeyPattern);
+
+        // Delete all matching keys
+        if (keys.length > 0) {
+            await redisClient.del(keys);
+        }
+
+        // Destroy the session and clear the cookie
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error destroying session:', err);
+                return res.status(500).send({ message: 'Error logging out' });
+            }
             res.clearCookie('userconnect.sid');
             res.sendStatus(200);
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error clearing cache during logout:', error);
+        res.status(500).send({ message: 'Error logging out' });
+    }
 });
 
 const getUser = asyncHandler(async (req, res) => {
