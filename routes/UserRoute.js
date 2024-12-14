@@ -20,5 +20,7 @@ router.post('/uploadphoto', authProtect, upload.single('photo'), UserController.
 router.get('/getphoto', authProtect, UserController.getPhoto);
 router.get('/gettransactions:limit?', authProtect, TransactionController.getTransactions);
 router.post('/transfer', authProtect, TransactionController.transferMoney);
+router.get('/cacheloadtransactions', authProtect, TransactionController.cacheLoadTransactions);
+router.get('/getcachedtransactions', authProtect, TransactionController.getCachedTransactions);
 
 module.exports = router;
