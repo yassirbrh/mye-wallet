@@ -99,16 +99,21 @@ const transferMoney = asyncHandler(async (req, res) => {
  * @param {Object} transaction - Transaction data to add
  */
 async function updateTransactionCache(cacheKey, transaction) {
-    const keyExists = await redisClient.exists(cacheKey);
+    // Get all keys matching the pattern *transactions*
+    const keys = await redisClient.keys('*transactions*');
+    
+    // Check if the given cacheKey exists in the list of keys
+    const keyExists = keys.includes(cacheKey);
+
     if (keyExists) {
+        // If the key exists, update the cache
         const cacheData = await redisClient.get(cacheKey);
         const transactionsArray = cacheData ? JSON.parse(cacheData) : [];
-        transactionsArray.unshift(transaction); // Add new transaction at the beginning
+        transactionsArray.unshift(transaction); // Add the new transaction
         await redisClient.set(cacheKey, JSON.stringify(transactionsArray));
-    } else {
-        await redisClient.set(cacheKey, JSON.stringify([transaction])); // Create a new array
     }
 }
+
 
 
 const getCachedTransactions = asyncHandler(async (req, res) => {
@@ -167,12 +172,12 @@ const cacheLoadTransactions = asyncHandler(async (req, res) => {
                     // If the sender is not the user, fetch sender's username
                     const operator = await User.findById(transaction.receiverID);
                     formattedTransaction.operatorUsername = operator ? operator.userName : 'Unknown';
-                    formattedTransaction.status = 'received';
+                    formattedTransaction.status = 'sent';
                 } else if (transaction.receiverID.toString() === userId) {
                     // If the receiver is not the user, fetch receiver's username
                     const operator = await User.findById(transaction.senderID);
                     formattedTransaction.operatorUsername = operator ? operator.userName : 'Unknown';
-                    formattedTransaction.status = 'sent';
+                    formattedTransaction.status = 'received';
                 }
                 
 
