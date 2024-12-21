@@ -22,5 +22,10 @@ router.get('/gettransactions:limit?', authProtect, TransactionController.getTran
 router.post('/transfer', authProtect, TransactionController.transferMoney);
 router.get('/cacheloadtransactions', authProtect, TransactionController.cacheLoadTransactions);
 router.get('/getcachedtransactions', authProtect, TransactionController.getCachedTransactions);
+router.get('/getmybeneficiaries', authProtect, UserController.getMyBeneficiaries);
+router.post('/getphotobyusername', authProtect, UserController.getPhotoByUsername);
+router.post('/searchbeneficiaries', authProtect, UserController.searchBeneficiaries);
+router.post('/addbeneficiarie', authProtect, UserController.addBeneficiarie);
+router.post('/deletebeneficiarie', authProtect, UserController.deleteBeneficiarie)
 
 module.exports = router;
