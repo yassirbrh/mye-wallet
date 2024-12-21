@@ -232,6 +232,34 @@ const getPhoto = asyncHandler(async (req, res) => {
 });
 
 
+const getPhotoByUsername = asyncHandler(async (req, res) => {
+    try {
+        // Find the user by userId
+        const user = await User.findOne({ userName: req.body.userName});
+
+        // Check if user exists and has a photo
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        const file = await File.findOne({ userId: user._id, type: 'ProfilePhoto'});
+
+        if (!file) {
+            return res.status(404).send('Image not found')
+        }
+
+        // Set the appropriate content type in the response headers
+        res.set('Content-Type', file.contentType); // Assuming the photo is JPEG format
+
+        // Send the image data
+        res.send(file.data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 const getUsernameById = asyncHandler(async (req, res) => {
     try {
         const user = await User.findById(req.body.operatorID);
@@ -240,6 +268,91 @@ const getUsernameById = asyncHandler(async (req, res) => {
     } catch (error) {
         console.log(error);
         res.status(400).send({message: 'User not found !!'});
+    }
+});
+
+
+const getMyBeneficiaries = asyncHandler(async (req, res) => {
+    try {
+        const myUser = await User.findById(req.session.userId);
+        const myBeneficiaries = myUser.Beneficiaries;
+        const listOfBeneficiaries = [];
+
+        for (const index in myBeneficiaries) {
+            const user = await User.findOne({ userName: myBeneficiaries[index] });
+            if (user) {
+                const userObj = {
+                    userName: user.userName,
+                    firstName: user.firstName,
+                    lastName: user.lastName
+                }
+                listOfBeneficiaries.push(userObj);
+            }
+        }
+
+        res.status(200).send({ listOfBeneficiaries });
+    } catch (error) {
+        console.log(error);
+        res.status(400).send({message: 'Error !!'});
+    }
+});
+
+const searchBeneficiaries = asyncHandler(async (req, res) => {
+    try {
+        const beneficiariePattern = req.body.beneficiariePattern;
+        if (!beneficiariePattern) {
+            return res.status(400).send({ message: 'Pattern is required!' });
+        }
+
+        // Search for users whose username starts with the pattern (case-insensitive)
+        const matchingUsers = await User.find({
+            userName: { $regex: `^${beneficiariePattern}`, $options: 'i' }
+        }).select('userName firstName lastName');
+
+        // Format response
+        const listOfBeneficiaries = matchingUsers.map(user => ({
+            userName: user.userName,
+            firstName: user.firstName,
+            lastName: user.lastName
+        }));
+
+        res.status(200).send({ listOfBeneficiaries });
+    } catch (error) {
+        console.error(error);
+        res.status(400).send({ message: 'Error fetching beneficiaries!' });
+    }
+});
+
+
+const addBeneficiarie = asyncHandler(async (req, res) => {
+    try {
+        const beneficiarieUsername = req.body.userName;
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+
+        user.Beneficiaries.push(beneficiarieUsername);
+        await user.save();
+
+        res.status(200).send({ message: 'Beneficiarie Added !!'});
+    } catch(error) {
+        res.status(400).send({message: 'Error !!'});
+    }
+});
+
+const deleteBeneficiarie = asyncHandler(async (req, res) => {
+    try {
+        const beneficiarieUsername = req.body.userName;
+        const userId = req.session.userId;
+        const user = await User.findById(userId);
+
+        user.Beneficiaries = user.Beneficiaries.filter(
+            (beneficiary) => beneficiary !== beneficiarieUsername
+        );
+        await user.save();
+
+        res.status(200).send({ message: 'Beneficiarie Added !!'});
+    } catch(error) {
+        res.status(400).send({ message: `Error !! ${error.message}`});
     }
 });
 
@@ -253,5 +366,10 @@ module.exports = {
     changePassword,
     uploadPhoto,
     getPhoto,
-    getUsernameById
+    getUsernameById,
+    getMyBeneficiaries,
+    getPhotoByUsername,
+    searchBeneficiaries,
+    addBeneficiarie,
+    deleteBeneficiarie
 };
