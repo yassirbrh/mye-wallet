@@ -7,6 +7,7 @@ import OverviewTransactions from "./OverviewPage/OverviewTransactions";
 import ProfileInfo from "./ProfilePage/ProfileInfo";
 import TransactionButton from "./TransactionPage/TransactionButton";
 import TransactionDashboard from "./TransactionPage/TransactionDashboard";
+import BeneficiarieDashboard from "./BeneficiariePage/BeneficiarieDashboard";
 
 const MainContent = ({userData, currentPage}) => {
     if (currentPage === 'TransactionPage') {
@@ -30,6 +31,10 @@ const MainContent = ({userData, currentPage}) => {
                     <>
                         <TransactionButton userData={userData}/>
                         <TransactionDashboard />
+                    </>
+                ): currentPage === 'BeneficiariePage' ? (
+                    <>
+                        <BeneficiarieDashboard />
                     </>
                 ): null}
             </div>
