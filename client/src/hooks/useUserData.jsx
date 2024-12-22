@@ -25,7 +25,7 @@ const useUserData = () => {
         const balanceRequests = await axios.get('/api/requests/getbalancerequests');
         let amountInDemands = 0;
         for (const balanceRequest of balanceRequests.data) {
-          if (balanceRequest.state === undefined) {
+          if (balanceRequest.state === 'pending') {
             amountInDemands += balanceRequest.amount;
           }
         }
