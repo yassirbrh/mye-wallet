@@ -8,6 +8,8 @@ import ProfileInfo from "./ProfilePage/ProfileInfo";
 import TransactionButton from "./TransactionPage/TransactionButton";
 import TransactionDashboard from "./TransactionPage/TransactionDashboard";
 import BeneficiarieDashboard from "./BeneficiariePage/BeneficiarieDashboard";
+import AmountDemandButton from "./AmountDemandPage/AmountDemandButton";
+import AmountDemandDashboard from "./AmountDemandPage/AmountDemandDashboard";
 
 const MainContent = ({userData, currentPage}) => {
     if (currentPage === 'TransactionPage') {
@@ -36,7 +38,12 @@ const MainContent = ({userData, currentPage}) => {
                     <>
                         <BeneficiarieDashboard />
                     </>
-                ): null}
+                ): currentPage === 'AmountDemandPage' ? (
+                    <>
+                        <AmountDemandButton userData={userData}/>
+                        <AmountDemandDashboard />
+                    </>
+                ):null}
             </div>
         </>
     )
