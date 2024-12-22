@@ -26,9 +26,22 @@ const requestBalance = asyncHandler(async (req, res) => {
 });
 
 const getBalanceRequests = asyncHandler(async (req, res) => {
-    const demands = await AmountDemand.find({ userID: req.session.userId });
+    const demands = await AmountDemand.find({ userID: req.session.userId }).sort({ doneAt: -1 });
+    const listOfDemands = [];
 
-    res.status(200).send(demands);
+    for (const demand of demands) {
+        listOfDemands.push({
+            ...demand.toObject(),
+            state: demand.toObject().state || 'pending',
+            doneAt: demand.toObject().doneAt.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+            }),
+        });
+    }
+
+    res.status(200).send(listOfDemands);
 });
 
 module.exports = {
