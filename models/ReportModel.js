@@ -11,7 +11,7 @@ const ReportSchema = mongoose.Schema({
     },
     answer: {
         type: String,
-        required: true
+        required: false
     },
     state: {
         type: String,
