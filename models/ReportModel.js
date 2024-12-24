@@ -9,6 +9,10 @@ const ReportSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    reportType: {
+        type: String,
+        required: true
+    },
     doneAt: {
         type: Date,
         required: true
