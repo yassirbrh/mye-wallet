@@ -10,6 +10,8 @@ import TransactionDashboard from "./TransactionPage/TransactionDashboard";
 import BeneficiarieDashboard from "./BeneficiariePage/BeneficiarieDashboard";
 import AmountDemandButton from "./AmountDemandPage/AmountDemandButton";
 import AmountDemandDashboard from "./AmountDemandPage/AmountDemandDashboard";
+import CreateReportDashboard from "./ReportPage/CreateReportDashboard";
+import CreateReportButton from './ReportPage/CreateReportButton';
 
 const MainContent = ({userData, currentPage}) => {
     if (currentPage === 'TransactionPage') {
@@ -43,7 +45,12 @@ const MainContent = ({userData, currentPage}) => {
                         <AmountDemandButton userData={userData}/>
                         <AmountDemandDashboard />
                     </>
-                ):null}
+                ): currentPage === 'ReportPage' ? (
+                    <>
+                        <CreateReportButton userData={userData}/>
+                        <CreateReportDashboard />
+                    </>
+                ): null}
             </div>
         </>
     )
