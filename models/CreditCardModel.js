@@ -25,10 +25,6 @@ const CreditCardSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    billingAddress: {
-        type: String,
-        required: true
-    },
     state: {
         type: String,
         default: 'pending'
