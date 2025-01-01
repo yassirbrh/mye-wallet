@@ -1,4 +1,3 @@
-import User from '../models/UserModel';
 import Report from '../models/ReportModel';
 const asyncHandler = require('express-async-handler');
 
