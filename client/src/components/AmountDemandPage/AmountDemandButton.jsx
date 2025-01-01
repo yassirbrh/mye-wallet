@@ -4,7 +4,7 @@ import useAmountRequest from '../../hooks/useAmountRequest';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const AmountDemandButton = ({ userData }) => {
+const AmountDemandButton = () => {
   const [isAmountDemandDropdownOpen, setAmountDemandDropdownOpen] = useState(false);
   const { inputAmount, handleInputChange, handleSubmit } = useAmountRequest();
 
