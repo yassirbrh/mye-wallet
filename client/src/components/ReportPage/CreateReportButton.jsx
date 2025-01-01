@@ -4,7 +4,7 @@ import useCreateReport from '../../hooks/useCreateReport';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const CreateReportButton = ({ userData }) => {
+const CreateReportButton = () => {
   const [isCreateReportDropdownOpen, setCreateReportDropdownOpen] = useState(false);
   const { reportMessage, setReportMessage, selectedReportType, setSelectedReportType, handleSubmit } = useCreateReport();
 
