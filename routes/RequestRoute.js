@@ -3,6 +3,7 @@ import AmountDemandController from '../controllers/AmountDemandController';
 import UserController from '../controllers/UserController';
 import NotificationController from '../controllers/NotificationController';
 import ReportController from '../controllers/ReportController';
+import CreditCardController from "../controllers/CreditCardController";
 import authProtect from '../middlewares/AuthMiddleware';
 
 const express = require('express');
@@ -18,5 +19,7 @@ router.post('/seenotifications', authProtect, NotificationController.seeNotifica
 router.post('/checknotification', authProtect, NotificationController.checkNotification);
 router.get('/getreports', authProtect, ReportController.getReports);
 router.post('/createreport', authProtect, ReportController.createReport);
+router.post('/requestcreditcard', authProtect, CreditCardController.requestCreditCard);
+router.get('/getcreditcards', authProtect, CreditCardController.getCreditCards);
 
 module.exports = router;
