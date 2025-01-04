@@ -12,6 +12,8 @@ import AmountDemandButton from "./AmountDemandPage/AmountDemandButton";
 import AmountDemandDashboard from "./AmountDemandPage/AmountDemandDashboard";
 import CreateReportDashboard from "./ReportPage/CreateReportDashboard";
 import CreateReportButton from './ReportPage/CreateReportButton';
+import ManageCreditCards from "./CreditCardPage/ManageCreditCards";
+import RequestCreditCard from "./CreditCardPage/RequestCreditCard";
 
 const MainContent = ({userData, currentPage}) => {
     if (currentPage === 'TransactionPage') {
@@ -49,6 +51,13 @@ const MainContent = ({userData, currentPage}) => {
                     <>
                         <CreateReportButton userData={userData}/>
                         <CreateReportDashboard />
+                    </>
+                ): currentPage === 'CreditCardPage' ? (
+                    <>
+                        <div style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "40px"}}>
+                            <RequestCreditCard />
+                            <ManageCreditCards />
+                        </div>
                     </>
                 ): null}
             </div>
