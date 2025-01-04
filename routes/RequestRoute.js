@@ -21,5 +21,6 @@ router.get('/getreports', authProtect, ReportController.getReports);
 router.post('/createreport', authProtect, ReportController.createReport);
 router.post('/requestcreditcard', authProtect, CreditCardController.requestCreditCard);
 router.get('/getcreditcards', authProtect, CreditCardController.getCreditCards);
+router.post('/handlecreditcardstate', authProtect, CreditCardController.handleCreditCardState);
 
 module.exports = router;
