@@ -16,6 +16,10 @@ const MessageSchema = mongoose.Schema({
     isSeen: {
         type: Boolean,
         default: false
+    },
+    doneAt: {
+        type: Date,
+        default: Date.now,
     }
 });
 
