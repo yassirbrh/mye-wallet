@@ -4,6 +4,7 @@ import UserController from '../controllers/UserController';
 import NotificationController from '../controllers/NotificationController';
 import ReportController from '../controllers/ReportController';
 import CreditCardController from "../controllers/CreditCardController";
+import MessageController from '../controllers/MessageController'
 import authProtect from '../middlewares/AuthMiddleware';
 
 const express = require('express');
@@ -22,5 +23,6 @@ router.post('/createreport', authProtect, ReportController.createReport);
 router.post('/requestcreditcard', authProtect, CreditCardController.requestCreditCard);
 router.get('/getcreditcards', authProtect, CreditCardController.getCreditCards);
 router.post('/handlecreditcardstate', authProtect, CreditCardController.handleCreditCardState);
+router.get('/getconversations', authProtect, MessageController.getConversations);
 
 module.exports = router;
