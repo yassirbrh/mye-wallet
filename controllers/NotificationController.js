@@ -1,4 +1,3 @@
-import User from '../models/UserModel';
 import Notification from '../models/NotificationModel';
 import Transaction from '../models/TransactionModel';
 const asyncHandler = require('express-async-handler');
