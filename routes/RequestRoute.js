@@ -24,5 +24,8 @@ router.post('/requestcreditcard', authProtect, CreditCardController.requestCredi
 router.get('/getcreditcards', authProtect, CreditCardController.getCreditCards);
 router.post('/handlecreditcardstate', authProtect, CreditCardController.handleCreditCardState);
 router.get('/getconversations', authProtect, MessageController.getConversations);
+router.post('/sendmessage', authProtect, MessageController.sendMessage);
+router.post('/getconversationbyusername', authProtect, MessageController.getConversationByUsername);
+router.post('/checkmessages', authProtect, MessageController.checkMessages);
 
 module.exports = router;
