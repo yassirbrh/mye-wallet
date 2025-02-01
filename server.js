@@ -36,10 +36,17 @@ app.use(session({
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
-    cookie: { 
-        expires: new Date(Date.now() + 3600000 * 24)
+    rolling: true, // Refresh expiration time on user activity
+    cookie: {
+        maxAge: 3600000 * 24 // Set a fixed expiration time
     }
 }));
+
+process.on('SIGINT', async () => {
+    await redisClient.quit();
+    console.log('Redis client disconnected');
+    process.exit(0);
+});
 
 // application endpoints
 app.use('/api/users', UserRoute);
