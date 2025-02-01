@@ -14,6 +14,8 @@ import CreateReportDashboard from "./ReportPage/CreateReportDashboard";
 import CreateReportButton from './ReportPage/CreateReportButton';
 import ManageCreditCards from "./CreditCardPage/ManageCreditCards";
 import RequestCreditCard from "./CreditCardPage/RequestCreditCard";
+import NewMessageButton from "./MessagePage/NewMessageButton";
+import MessageDashboard from "./MessagePage/MessageDashboard";
 
 const MainContent = ({userData, currentPage}) => {
     if (currentPage === 'TransactionPage') {
@@ -58,6 +60,11 @@ const MainContent = ({userData, currentPage}) => {
                             <RequestCreditCard />
                             <ManageCreditCards />
                         </div>
+                    </>
+                ): currentPage === 'MessagePage' ? (
+                    <>
+                        <NewMessageButton beneficiaries={userData.Beneficiaries}/>
+                        <MessageDashboard />
                     </>
                 ): null}
             </div>
