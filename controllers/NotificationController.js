@@ -1,3 +1,4 @@
+import Message from '../models/MessageModel';
 import Notification from '../models/NotificationModel';
 import Transaction from '../models/TransactionModel';
 const asyncHandler = require('express-async-handler');
@@ -40,6 +41,10 @@ const checkNotification = asyncHandler(async (req, res) => {
             const transaction = await Transaction.findOne({ _id: notifID });
 
             res.status(200).send({ type: 'Transaction', transaction });
+        } else if (notification.type === 'Message') {
+            const message = await Message.findById(notifID);
+
+            res.status(200).send({ type: 'Message', message});
         }
     } catch(error) {
         res.status(400).send({ message: error });
