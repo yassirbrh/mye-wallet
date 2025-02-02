@@ -46,7 +46,7 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
         marginBottom: "10px",
     };
 
-    const transactionHeaderStyle = {
+    const HeaderStyle = {
         fontSize: "20px",
         fontWeight: "bold",
         marginBottom: "10px",
@@ -103,7 +103,7 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
 
     const renderTransactionDetails = (transaction) => (
         <>
-            <div style={transactionHeaderStyle}>Transaction Details</div>
+            <div style={HeaderStyle}>Transaction Details</div>
             {/*<div style={detailStyle}><strong>Sender:</strong> {transaction.senderID}</div>*/}
             {/*<div style={detailStyle}><strong>Receiver:</strong> {transaction.receiverID}</div>*/}
             <div style={detailStyle}><strong>Amount:</strong> ${transaction.transactionBalance}</div>
@@ -116,6 +116,16 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
             )}
         </>
     );
+    const renderMessageDetails = (message) => (
+        <>
+          <div style={HeaderStyle}>Message Details</div>
+          <div style={detailStyle}><strong>Message:</strong> {message.content}</div>
+          {message.doneAt && (
+            <div style={detailStyle}><strong>Completed At:</strong> {new Date(message.doneAt).toLocaleString()}</div>
+          )}
+        </>
+    );
+      
 
     // Handle going back to the notification list
     const handleGoBack = () => {
@@ -128,7 +138,7 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
         axios
             .post('/api/requests/checknotification', { notificationID: notification.notifID })
             .then(response => {
-                const { transaction } = response.data;
+                const { transaction, message } = response.data;
     
                 if (transaction) {
                     const popupContent = `
@@ -189,6 +199,58 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
                     const popupWindow = window.open('', '_blank', 'width=600,height=600,left=200,top=100');
                     popupWindow.document.write(popupContent);
                     popupWindow.document.close();
+                } else if (message) {
+                    const popupContent = `
+                            <html>
+                                <head>
+                                <title>Message Notification</title>
+                                <style>
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        margin: 0;
+                                        padding: 20px;
+                                        background-color: #f9f9f9;
+                                    }
+                                    .container {
+                                        max-width: 400px;
+                                        margin: 0 auto;
+                                        background-color: #fff;
+                                        padding: 15px;
+                                        border: 1px solid #ccc;
+                                        border-radius: 8px;
+                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                                    }
+                                    h2 {
+                                        color: #007bff;
+                                        margin-bottom: 15px;
+                                        font-size: 20px;
+                                    }
+                                    p {
+                                        margin: 10px 0;
+                                        font-size: 14px;
+                                        color: #333;
+                                    }
+                                    .bold {
+                                        font-weight: bold;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h2>Message Notification</h2>
+                                    <p>${notification.notifMessage}</p>
+                                    <p class="bold">Message:</p>
+                                    <p>${message.content || "No message content available."}</p>
+                                    ${message.doneAt ? `<p><span class="bold">Sent At:</span> ${new Date(message.doneAt).toLocaleString()}</p>` : ""}
+                                </div>
+                            </body>
+                        </html>
+                    `;
+
+                    // Open a new popup window with the message details
+                    const popupWindow = window.open('', '_blank', 'width=450,height=400,left=300,top=150');
+                    popupWindow.document.write(popupContent);
+                    popupWindow.document.close();
                 }
                 setLoading(false);
             })
@@ -223,16 +285,30 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
                             <div style={backButtonStyle} onClick={handleGoBack}>
                                 <i className="bx bx-arrow-back"></i> Go back to notifications
                             </div>
-                            {notificationData?.type === 'Transaction' && (
-                                <>
-                                    <div style={transactionHeaderStyle}>Transaction</div>
-                                    <div style={messageStyle}>{clickedNotification.notifMessage}</div>
-                                    {renderTransactionDetails(notificationData.transaction)}
-                                </>
-                            )}
-                            {['Message', 'Report'].includes(notificationData?.type) && (
-                                <div>Working on later</div>
-                            )}
+                            {
+                                notificationData?.type === 'Transaction' && (
+                                    <>
+                                        <div style={HeaderStyle}>Transaction</div>
+                                        <div style={messageStyle}>{clickedNotification.notifMessage}</div>
+                                        {renderTransactionDetails(notificationData.transaction)}
+                                    </>
+                                )
+                            }
+                            {
+                                notificationData?.type === 'Message' && (
+                                    <>
+                                        <div style={HeaderStyle}>Message</div>
+                                        <div style={messageStyle}>{clickedNotification.notifMessage}</div>
+                                        {renderMessageDetails(notificationData.message)}
+                                    </>
+                                )
+                            }
+                            {
+                                ['Report'].includes(notificationData?.type) && (
+                                    <div>Working on later</div>
+                                )
+                            }
+
                         </>
                     )
                 ) : null}
