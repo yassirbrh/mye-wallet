@@ -4,7 +4,8 @@ import UserController from '../controllers/UserController';
 import NotificationController from '../controllers/NotificationController';
 import ReportController from '../controllers/ReportController';
 import CreditCardController from "../controllers/CreditCardController";
-import MessageController from '../controllers/MessageController'
+import MessageController from '../controllers/MessageController';
+import AssistanceController from '../controllers/AssistanceController';
 import authProtect from '../middlewares/AuthMiddleware';
 
 const express = require('express');
@@ -27,5 +28,7 @@ router.get('/getconversations', authProtect, MessageController.getConversations)
 router.post('/sendmessage', authProtect, MessageController.sendMessage);
 router.post('/getconversationbyusername', authProtect, MessageController.getConversationByUsername);
 router.post('/checkmessages', authProtect, MessageController.checkMessages);
+router.get('/getassistance', authProtect, AssistanceController.getAssistance);
+router.post('/askassistance', authProtect, AssistanceController.askAssistance);
 
 module.exports = router;
