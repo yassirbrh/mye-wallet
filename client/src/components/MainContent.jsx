@@ -16,6 +16,7 @@ import ManageCreditCards from "./CreditCardPage/ManageCreditCards";
 import RequestCreditCard from "./CreditCardPage/RequestCreditCard";
 import NewMessageButton from "./MessagePage/NewMessageButton";
 import MessageDashboard from "./MessagePage/MessageDashboard";
+import AssistanceBar from "./AssistancePage/AssistanceBar";
 
 const MainContent = ({userData, currentPage}) => {
     if (currentPage === 'TransactionPage') {
@@ -65,6 +66,10 @@ const MainContent = ({userData, currentPage}) => {
                     <>
                         <NewMessageButton beneficiaries={userData.Beneficiaries}/>
                         <MessageDashboard />
+                    </>
+                ): currentPage === 'AssistancePage' ? (
+                    <>
+                        <AssistanceBar />
                     </>
                 ): null}
             </div>
