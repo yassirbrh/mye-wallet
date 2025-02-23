@@ -33,10 +33,6 @@ const AdminSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    privileges: {
-        type: mongoose.Schema.Types.Mixed,
-        required: true
-    },
     adminType: {
         type: String,
         required: true
