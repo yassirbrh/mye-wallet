@@ -7,6 +7,7 @@ const CreditCardSchema = mongoose.Schema({
     },
     userID: {
         type: mongoose.Types.ObjectId,
+        ref: "User",
         required: true
     },
     holderName: {
