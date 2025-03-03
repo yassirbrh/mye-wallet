@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const AssistanceSchema = mongoose.Schema({
     userID: {
         type: mongoose.Types.ObjectId,
+        ref: "User",
         required: true
     },
     messages: [{
