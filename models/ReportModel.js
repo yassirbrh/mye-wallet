@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const ReportSchema = mongoose.Schema({
     userID: {
         type: mongoose.Types.ObjectId,
+        ref: "User",
         required: true
     },
     reportMessage: {
