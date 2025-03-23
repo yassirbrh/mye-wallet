@@ -1,3 +1,4 @@
+import AmountDemand from '../models/AmountDemandModel';
 import Message from '../models/MessageModel';
 import Notification from '../models/NotificationModel';
 import Transaction from '../models/TransactionModel';
@@ -45,6 +46,10 @@ const checkNotification = asyncHandler(async (req, res) => {
             const message = await Message.findById(notifID);
 
             res.status(200).send({ type: 'Message', message});
+        } else if (notification.type === 'Amount Demand') {
+            const amountdemand = await AmountDemand.findById(notifID);
+
+            res.status(200).send({ type: 'Amount Demand', amountdemand})
         }
     } catch(error) {
         res.status(400).send({ message: error });
