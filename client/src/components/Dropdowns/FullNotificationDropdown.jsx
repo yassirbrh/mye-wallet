@@ -125,6 +125,26 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
           )}
         </>
     );
+    const renderAmountDemandDetails = (amountdemand) => (
+        <>
+          <div style={HeaderStyle}>Amount Demand Details</div>
+          <div style={detailStyle}><strong>Amount demanded:</strong> {amountdemand.amount}$</div>
+          {amountdemand.doneAt && (
+            <div style={detailStyle}><strong>Completed At:</strong> {new Date(amountdemand.doneAt).toLocaleString()}</div>
+          )}
+        </>
+    );
+    const renderReportDetails = (report) => (
+        <>
+          <div style={HeaderStyle}>Report Details</div>
+          <div style={detailStyle}><strong>Report Message:</strong> {report.reportMessage}</div>
+          <div style={detailStyle}><strong>Report Type:</strong> {report.reportType}</div>
+          <div style={detailStyle}><strong>Report Answer:</strong> {report.answer}</div>
+          {report.doneAt && (
+            <div style={detailStyle}><strong>Done At:</strong> {new Date(report.doneAt).toLocaleString()}</div>
+          )}
+        </>
+    );
       
 
     // Handle going back to the notification list
@@ -138,7 +158,7 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
         axios
             .post('/api/requests/checknotification', { notificationID: notification.notifID })
             .then(response => {
-                const { transaction, message } = response.data;
+                const { transaction, message, amountdemand, report } = response.data;
     
                 if (transaction) {
                     const popupContent = `
@@ -251,6 +271,110 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
                     const popupWindow = window.open('', '_blank', 'width=450,height=400,left=300,top=150');
                     popupWindow.document.write(popupContent);
                     popupWindow.document.close();
+                } else if (amountdemand) {
+                    const popupContent = `
+                            <html>
+                                <head>
+                                <title>Amount Demand Notification</title>
+                                <style>
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        margin: 0;
+                                        padding: 20px;
+                                        background-color: #f9f9f9;
+                                    }
+                                    .container {
+                                        max-width: 400px;
+                                        margin: 0 auto;
+                                        background-color: #fff;
+                                        padding: 15px;
+                                        border: 1px solid #ccc;
+                                        border-radius: 8px;
+                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                                    }
+                                    h2 {
+                                        color: #007bff;
+                                        margin-bottom: 15px;
+                                        font-size: 20px;
+                                    }
+                                    p {
+                                        margin: 10px 0;
+                                        font-size: 14px;
+                                        color: #333;
+                                    }
+                                    .bold {
+                                        font-weight: bold;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h2>Amount Demand Notification</h2>
+                                    <p>${notification.notifMessage}</p>
+                                    <p class="bold">Amount Demand:</p>
+                                    <p>Amount demanded: ${amountdemand.amount}</p>
+                                    ${amountdemand.doneAt ? `<p><span class="bold">Sent At:</span> ${new Date(amountdemand.doneAt).toLocaleString()}</p>` : ""}
+                                </div>
+                            </body>
+                        </html>
+                    `;
+
+                    // Open a new popup window with the message details
+                    const popupWindow = window.open('', '_blank', 'width=450,height=400,left=300,top=150');
+                    popupWindow.document.write(popupContent);
+                    popupWindow.document.close();
+                } else if (report) {
+                    const popupContent = `
+                            <html>
+                                <head>
+                                <title>Report Notification</title>
+                                <style>
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        margin: 0;
+                                        padding: 20px;
+                                        background-color: #f9f9f9;
+                                    }
+                                    .container {
+                                        max-width: 400px;
+                                        margin: 0 auto;
+                                        background-color: #fff;
+                                        padding: 15px;
+                                        border: 1px solid #ccc;
+                                        border-radius: 8px;
+                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                                    }
+                                    h2 {
+                                        color: #007bff;
+                                        margin-bottom: 15px;
+                                        font-size: 20px;
+                                    }
+                                    p {
+                                        margin: 10px 0;
+                                        font-size: 14px;
+                                        color: #333;
+                                    }
+                                    .bold {
+                                        font-weight: bold;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h2>Amount Demand Notification</h2>
+                                    <p>${notification.notifMessage}</p>
+                                    <p class="bold">Amount Demand:</p>
+                                    <p>Report Message: ${report.reportMessage}</p>
+                                    ${report.doneAt ? `<p><span class="bold">Sent At:</span> ${new Date(report.doneAt).toLocaleString()}</p>` : ""}
+                                </div>
+                            </body>
+                        </html>
+                    `;
+
+                    // Open a new popup window with the message details
+                    const popupWindow = window.open('', '_blank', 'width=450,height=400,left=300,top=150');
+                    popupWindow.document.write(popupContent);
+                    popupWindow.document.close();
                 }
                 setLoading(false);
             })
@@ -304,8 +428,21 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
                                 )
                             }
                             {
-                                ['Report'].includes(notificationData?.type) && (
-                                    <div>Working on later</div>
+                                notificationData?.type === 'Amount Demand' && (
+                                    <>
+                                        <div style={HeaderStyle}>Amount Demand</div>
+                                        <div style={messageStyle}>{clickedNotification.notifMessage}</div>
+                                        {renderAmountDemandDetails(notificationData.amountdemand)}
+                                    </>
+                                )
+                            }
+                            {
+                                notificationData?.type === 'Report' && (
+                                    <>
+                                        <div style={HeaderStyle}>Report</div>
+                                        <div style={messageStyle}>{clickedNotification.notifMessage}</div>
+                                        {renderReportDetails(notificationData.report)}
+                                    </>
                                 )
                             }
 
