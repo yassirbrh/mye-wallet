@@ -89,7 +89,7 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
         if (clickedNotification) {
             setLoading(true);
             axios
-                .post('/api/requests/checknotification', { notificationID: clickedNotification.notifID })
+                .post('/api/requests/checknotification', { notificationID: clickedNotification.notifID, type: clickedNotification.type })
                 .then(response => {
                     setNotificationData(response.data);
                     setLoading(false);
@@ -145,7 +145,20 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
           )}
         </>
     );
-      
+    const renderCreditCardDetails = (creditcard) => {
+        if (!creditcard) {
+            return <div style={HeaderStyle}>Your credit card request has been rejected.</div>;
+        }
+    
+        return (
+            <>
+                <div style={HeaderStyle}>Credit Card Details</div>
+                <div style={detailStyle}><strong>Credit Card Number:</strong> {creditcard.cardNumber}</div>
+                <div style={detailStyle}><strong>Expiration Date:</strong> {creditcard.expDate}</div>
+            </>
+        );
+    };
+    
 
     // Handle going back to the notification list
     const handleGoBack = () => {
@@ -156,9 +169,9 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
     const openNotificationPopup = (notification) => {
         setLoading(true);
         axios
-            .post('/api/requests/checknotification', { notificationID: notification.notifID })
+            .post('/api/requests/checknotification', { notificationID: notification.notifID, type: notification.type })
             .then(response => {
-                const { transaction, message, amountdemand, report } = response.data;
+                const { transaction, message, amountdemand, report, creditcard, assistance } = response.data;
     
                 if (transaction) {
                     const popupContent = `
@@ -375,6 +388,107 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
                     const popupWindow = window.open('', '_blank', 'width=450,height=400,left=300,top=150');
                     popupWindow.document.write(popupContent);
                     popupWindow.document.close();
+                } else if (creditcard) {
+                    const popupContent = `
+                            <html>
+                                <head>
+                                <title>Credit Card Notification</title>
+                                <style>
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        margin: 0;
+                                        padding: 20px;
+                                        background-color: #f9f9f9;
+                                    }
+                                    .container {
+                                        max-width: 400px;
+                                        margin: 0 auto;
+                                        background-color: #fff;
+                                        padding: 15px;
+                                        border: 1px solid #ccc;
+                                        border-radius: 8px;
+                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                                    }
+                                    h2 {
+                                        color: #007bff;
+                                        margin-bottom: 15px;
+                                        font-size: 20px;
+                                    }
+                                    p {
+                                        margin: 10px 0;
+                                        font-size: 14px;
+                                        color: #333;
+                                    }
+                                    .bold {
+                                        font-weight: bold;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h2>Credit Card Notification</h2>
+                                    <p>${notification.notifMessage}</p>
+                                    <p class="bold">Credit Card:</p>
+                                    <p>Credit Card Number: ${creditcard.cardNumber}</p>
+                                    ${`<p><span class="bold">Expiration Date:</span> ${new Date(creditcard.expDate).toLocaleString()}</p>`}
+                                </div>
+                            </body>
+                        </html>
+                    `;
+
+                    // Open a new popup window with the message details
+                    const popupWindow = window.open('', '_blank', 'width=450,height=400,left=300,top=150');
+                    popupWindow.document.write(popupContent);
+                    popupWindow.document.close();
+                } else if (assistance) {
+                    const popupContent = `
+                            <html>
+                                <head>
+                                <title>Assistance Notification</title>
+                                <style>
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        margin: 0;
+                                        padding: 20px;
+                                        background-color: #f9f9f9;
+                                    }
+                                    .container {
+                                        max-width: 400px;
+                                        margin: 0 auto;
+                                        background-color: #fff;
+                                        padding: 15px;
+                                        border: 1px solid #ccc;
+                                        border-radius: 8px;
+                                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                                    }
+                                    h2 {
+                                        color: #007bff;
+                                        margin-bottom: 15px;
+                                        font-size: 20px;
+                                    }
+                                    p {
+                                        margin: 10px 0;
+                                        font-size: 14px;
+                                        color: #333;
+                                    }
+                                    .bold {
+                                        font-weight: bold;
+                                    }
+                                </style>
+                            </head>
+                            <body>
+                                <div class="container">
+                                    <h2>Assistance Notification</h2>
+                                    <p>${notification.notifMessage}</p>
+                                </div>
+                            </body>
+                        </html>
+                    `;
+
+                    // Open a new popup window with the message details
+                    const popupWindow = window.open('', '_blank', 'width=450,height=400,left=300,top=150');
+                    popupWindow.document.write(popupContent);
+                    popupWindow.document.close();
                 }
                 setLoading(false);
             })
@@ -445,7 +559,23 @@ const FullNotificationDropdown = ({ clickedNotification = null, closeDropdown })
                                     </>
                                 )
                             }
-
+                            {
+                                notificationData?.type === 'Credit Card' && (
+                                    <>
+                                        <div style={HeaderStyle}>Credit Card</div>
+                                        <div style={messageStyle}>{clickedNotification.notifMessage}</div>
+                                        {renderCreditCardDetails(notificationData.creditcard)}
+                                    </>
+                                )
+                            }
+                            {
+                                notificationData?.type === 'Assistance' && (
+                                    <>
+                                        <div style={HeaderStyle}>Assistance</div>
+                                        <div style={messageStyle}>{clickedNotification.notifMessage}</div>
+                                    </>
+                                )
+                            }
                         </>
                     )
                 ) : null}
