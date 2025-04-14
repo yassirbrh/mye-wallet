@@ -78,7 +78,7 @@ admin.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: { 
-        expires: new Date(Date.now() + 3600000 * 24)
+        maxAge: 3600000 * 24
     }
 }));
 
