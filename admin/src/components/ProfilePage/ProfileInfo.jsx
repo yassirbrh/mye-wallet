@@ -1,0 +1,211 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const ProfileInfo = ({ adminData }) => {
+    const [adminInfo, setAdminInfo] = useState({
+        firstName: adminData.firstName,
+        lastName: adminData.lastName,
+        email: adminData.email,
+    });
+
+    const [isEditing, setIsEditing] = useState(false);
+    const [profilePhoto, setProfilePhoto] = useState("https://via.placeholder.com/120");
+    const [showChangePassword, setShowChangePassword] = useState(false);
+    const [passwords, setPasswords] = useState({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    useEffect(() => {
+        setAdminInfo({
+            firstName: adminData.firstName,
+            lastName: adminData.lastName,
+            email: adminData.email,
+        });
+        setProfilePhoto(adminData.profilePhoto);
+    }, [adminData]);
+
+    const toggleEdit = async () => {
+        setIsEditing(!isEditing);
+        if (isEditing) {
+            const response = await axios.post("/api/admin/updateadmin", {
+                firstName: adminInfo.firstName,
+                lastName: adminInfo.lastName,
+                email: adminInfo.email
+            });
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setAdminInfo({ ...adminInfo, [id]: value });
+    };
+
+    const handlePhotoUpload = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => setProfilePhoto(e.target.result);
+            reader.readAsDataURL(file);
+
+            // Upload photo to the server
+            const formData = new FormData();
+            formData.append("photo", file);
+
+            try {
+                const response = await axios.post("/api/admin/uploadphoto", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                if (response.status === 201) {
+                    console.log("Image uploaded successfully");
+                }
+            } catch (error) {
+                console.error("Error uploading image:", error);
+            }
+        }
+    };
+
+    const handlePasswordChange = (e) => {
+        const { id, value } = e.target;
+        setPasswords({ ...passwords, [id]: value });
+    };
+
+    const saveNewPassword = async () => {
+        if (passwords.newPassword !== passwords.confirmPassword) {
+            toast.error("New passwords do not match");
+            return;
+        }
+
+        try {
+            const response = await axios.post("/api/admin/changepassword", {
+                oldPassword: passwords.oldPassword,
+                password: passwords.newPassword,
+            });
+            toast.success(response.data);
+            setShowChangePassword(false);
+        } catch (error) {
+            const errorMessage = error.response?.data || "An error occurred";
+            console.log(error.response);
+            toast.error(errorMessage);
+        }
+    };
+
+    return (
+        <div>
+            {/* Profile Info Section */}
+            <div className="profile-info">
+                <form className="profile-form">
+                    {/* Profile Photo */}
+                    <div className="profile-photo">
+                        <div className="photo-overlay">
+                            <img src={profilePhoto} alt="Profile Photo" className="profile-image" />
+                            <div className="upload-icon" onClick={() => document.getElementById('uploadPhoto').click()}>
+                                <i className="bx bxs-image-add"></i>
+                                <input
+                                    type="file"
+                                    id="uploadPhoto"
+                                    accept="image/*"
+                                    style={{ display: "none" }}
+                                    onChange={handlePhotoUpload}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Profile Details */}
+                    <div className="form-fields">
+                        <div className="form-group">
+                            <label htmlFor="firstName">First Name:</label>
+                            <input
+                                type="text"
+                                id="firstName"
+                                value={adminInfo.firstName}
+                                readOnly={!isEditing}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="lastName">Last Name:</label>
+                            <input
+                                type="text"
+                                id="lastName"
+                                value={adminInfo.lastName}
+                                readOnly={!isEditing}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="email">Email:</label>
+                            <input
+                                type="email"
+                                id="email"
+                                value={adminInfo.email}
+                                readOnly={!isEditing}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Edit Button */}
+                    <div className="form-actions">
+                        <button type="button" className={isEditing ? "save-btn" : "edit-btn"} onClick={toggleEdit}>
+                            {isEditing ? "Save" : "Edit"}
+                        </button>
+                        <button type="button" className="change-password-btn" onClick={() => setShowChangePassword(true)}>
+                            Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            {/* Change Password Section */}
+            {showChangePassword && (
+                <div className="change-password">
+                    <form className="password-form">
+                        <div className="form-group">
+                            <label htmlFor="oldPassword">Old Password:</label>
+                            <input
+                                type="password"
+                                id="oldPassword"
+                                value={passwords.oldPassword}
+                                onChange={handlePasswordChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="newPassword">New Password:</label>
+                            <input
+                                type="password"
+                                id="newPassword"
+                                value={passwords.newPassword}
+                                onChange={handlePasswordChange}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="confirmPassword">Confirm New Password:</label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                value={passwords.confirmPassword}
+                                onChange={handlePasswordChange}
+                            />
+                        </div>
+
+                        <div className="form-actions">
+                            <button type="button" className="save-btn" onClick={saveNewPassword}>
+                                Save Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
+            <ToastContainer />
+        </div>
+    );
+};
+
+export default ProfileInfo;
